@@ -1,0 +1,27 @@
+{
+    "database": {
+        "type": "sqlite",
+        "sqlite_path": "data/eds.db",
+        "postgresql": {
+            "host": "localhost",
+            "port": 5432,
+            "database": "eds_db",
+            "user": "postgres",
+            "password": "your_password_here"
+        }
+    },
+    "ui": {
+        "theme": "modern",
+        "window_size": "900x750"
+    },
+    "security": {
+        "session_timeout": 3600,
+        "max_login_attempts": 3
+    },
+    "logging": {
+        "level": "INFO",
+        "file": "logs/eds_app.log",
+        "max_size_mb": 10,
+        "backup_count": 5
+    }
+}
