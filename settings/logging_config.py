@@ -1,6 +1,10 @@
 import logging.config
+import os
 
 def setup_logging():
+    log_dir = 'logs'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
     log_config = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -15,7 +19,7 @@ def setup_logging():
                 'class': 'logging.FileHandler',
                 'level': 'INFO',
                 'formatter': 'standard',
-                'filename': 'logs/eds_app.log',
+                'filename': os.path.join(log_dir, 'eds_app.log'),
             },
             'console_handler': {
                 'class': 'logging.StreamHandler',

@@ -29,17 +29,25 @@ A modern, secure data collection application for managing EDS (Energy Dispersive
 ```bash
 📁 File Structure
 EDS_Application/
-├── main.py              # Main contain register and Login 
-├── config.json          # Configuration file
-├── requirements.txt     # Python dependencies
-├── license.txt          # Python dependencies
-├── README.md            # This file
-├── data/                # Database storage
-│   └── eds.db           # SQLite database
+├── main.py              
+├── config.json          
+├── requirements.txt     
+├── license.txt          
+├── README.md            
+├── settings/            
+│   └── config.json           
+│   └── logging_config.py           
+│   └── configmanager.py        
+├── subwindows/                
+│   └──loginwindows.py          
+│   └── mainwindows.py        
+│   └── registerwindows.py          
+├── data/                
+│   └── eds.db         # I already added username admin password 123456 for testing  
 ├── icon/                
-│   └── logo.ico         # Main Window Logo
-└── logs/                # Application logs
-    └── eds_app.log      # Log file
+│   └── logo.ico         
+└── logs/                
+    └── eds_app.log      
 
 ```
 ## Note:
