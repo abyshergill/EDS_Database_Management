@@ -18,10 +18,13 @@ logger = logging.getLogger(__name__)
 class MainWindow:
     def __init__(self, root, icon_path):
         self.root = root
-        self.root.iconbitmap(icon_path)
+        self.icon_path = icon_path
+        self.root.withdraw()
+        self.root.iconbitmap(default=icon_path)
         self.config_manager = ConfigManager()
         self.current_user = None
         self.setup_ui()  
+        self.root.update_idletasks() 
         self.db_handler = DatabaseHandler(self.config_manager)
         self.show_login()
         
@@ -42,11 +45,12 @@ class MainWindow:
         
     def show_login(self):
         #self.root.withdraw()   #==> Issue 0 Hide main window As of now it is not working future i will fix this
-        LoginWindow(self.root, self.db_handler, self.on_login_success)
+        #self.root.after(50, self.root.withdraw)
+        LoginWindow(self.root, self.db_handler, self.on_login_success, self.icon_path)
 
     def on_login_success(self, username):
         self.current_user = username
-        #self.root.deiconify()  #==> Issue 0 Show main window As of now it is not working future i will fix this
+        self.root.deiconify()  #==> Issue 0 Show main window As of now it is not working future i will fix this
         self.create_widgets()
         self.update_user_info()
     

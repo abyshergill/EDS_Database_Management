@@ -11,15 +11,18 @@ import json
 from subwindows.registerwindow import RegisterWindow
 
 class LoginWindow:
-    def __init__(self, parent, db_handler, on_success):
+    def __init__(self, parent, db_handler, on_success, icon_path=None):
         self.parent = parent
         self.db_handler = db_handler
         self.on_success = on_success
         self.current_user = None
+        self.icon_path = icon_path
         self.create_login_window()
     
     def create_login_window(self):
         self.login_window = tk.Toplevel(self.parent)
+        if self.icon_path:
+            self.login_window.iconbitmap(self.icon_path)
         self.login_window.title("EDS Data Collection - Login")
         self.login_window.geometry("400x400")
         self.login_window.resizable(False, False)
@@ -38,7 +41,7 @@ class LoginWindow:
 
         self.login_window.geometry(f'{window_width}x{window_height}+{x}+{y}')
 
-        self.login_window.transient(self.parent)
+        #self.login_window.transient(self.parent)
         #====================================================
 
         main_frame = tk.Frame(self.login_window, bg="#34495e", relief="flat", bd=2)
