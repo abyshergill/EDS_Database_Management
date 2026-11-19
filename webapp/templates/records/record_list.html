@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Records{% endblock %}
+{% block page_title %}EDS Records{% endblock %}
+{% block page_subtitle %}Browse, search and manage analysis entries{% endblock %}
+{% block actions %}
+<a class="btn btn-primary" href="{% url 'records:create' %}"><i class="bi bi-plus-lg"></i><span class="d-none d-sm-inline"> New record</span></a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3"><div class="card-soft stat-card">
+    <div class="stat-icon tint-indigo"><i class="bi bi-database"></i></div>
+    <div><div class="stat-value">{{ stats.total|intcomma }}</div><div class="stat-label">Total records</div></div>
+  </div></div>
+  <div class="col-sm-6 col-xl-3"><div class="card-soft stat-card">
+    <div class="stat-icon tint-cyan"><i class="bi bi-calendar-plus"></i></div>
+    <div><div class="stat-value">{{ stats.this_week|intcomma }}</div><div class="stat-label">Added this week</div></div>
+  </div></div>
+  <div class="col-sm-6 col-xl-3"><div class="card-soft stat-card">
+    <div class="stat-icon tint-emerald"><i class="bi bi-images"></i></div>
+    <div><div class="stat-value">{{ stats.with_images|intcomma }}</div><div class="stat-label">Records with images</div></div>
+  </div></div>
+  <div class="col-sm-6 col-xl-3"><div class="card-soft stat-card">
+    <div class="stat-icon tint-amber"><i class="bi bi-activity"></i></div>
+    <div><div class="stat-value">{{ stats.changes_week|intcomma }}</div><div class="stat-label">Changes this week</div></div>
+  </div></div>
+</div>
+
+<div class="card-soft">
+  <div class="card-header-soft flex-wrap">
+    <form method="get" class="d-flex gap-2 flex-grow-1" style="max-width: 520px;">
+      <div class="search-input flex-grow-1">
+        <i class="bi bi-search"></i>
+        <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Search component or remarks…" aria-label="Search">
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+      {% if query %}<a class="btn btn-light" href="{% url 'records:list' %}">Clear</a>{% endif %}
+    </form>
+    <small class="text-muted-2">{{ page.paginator.count }} result{{ page.paginator.count|pluralize }}</small>
+  </div>
+
+  {% if page.object_list %}
+  <div class="table-responsive">
+    <table class="table table-modern">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Images</th>
+          <th>Component</th>
+          <th>Remark</th>
+          <th>Created by</th>
+          <th>Last modified</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in page.object_list %}
+        <tr class="row-link" data-href="{{ r.get_absolute_url }}">
+          <td class="text-muted-2">{{ r.pk }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              {% if r.vhx_image %}<img class="thumb" src="{% url 'records:image' r.pk 'vhx' %}" alt="VHX" loading="lazy">{% else %}<span class="thumb thumb-empty" title="No VHX image"><i class="bi bi-image"></i></span>{% endif %}
+              {% if r.eds_image %}<img class="thumb" src="{% url 'records:image' r.pk 'eds' %}" alt="EDS" loading="lazy">{% else %}<span class="thumb thumb-empty" title="No EDS image"><i class="bi bi-bar-chart"></i></span>{% endif %}
+            </div>
+          </td>
+          <td class="fw-semibold">{{ r.component }}</td>
+          <td><div class="truncate text-muted-2">{{ r.remark|default:"—" }}</div></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="avatar avatar-sm">{{ r.created_by.username|default:"?"|first }}</span>
+              <span>{{ r.created_by.username|default:"(deleted user)" }}</span>
+            </div>
+          </td>
+          <td class="text-muted-2" title="{{ r.modified_at }}">{{ r.modified_at|naturaltime }}</td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-light btn-icon" href="{% url 'records:detail' r.pk %}" title="View"><i class="bi bi-eye"></i></a>
+            <a class="btn btn-light btn-icon" href="{% url 'records:update' r.pk %}" title="Edit"><i class="bi bi-pencil"></i></a>
+            <button class="btn btn-light btn-icon text-danger" type="button" title="Delete"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{% url 'records:delete' r.pk %}" data-name="{{ r.component }}"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "partials/pagination.html" %}
+  {% else %}
+  <div class="empty-state">
+    <i class="bi bi-inboxes"></i>
+    {% if query %}
+      <h5 class="mt-3">No records match “{{ query }}”</h5>
+      <p>Try a different component name.</p>
+    {% else %}
+      <h5 class="mt-3">No records yet</h5>
+      <p>Create the first EDS record to get started.</p>
+      <a class="btn btn-primary" href="{% url 'records:create' %}"><i class="bi bi-plus-lg"></i> New record</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+{% include "records/_delete_modal.html" %}
+{% endblock %}

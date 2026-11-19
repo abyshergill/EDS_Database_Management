@@ -1,0 +1,21 @@
+{% load eds_tags %}
+{% if page.paginator.num_pages > 1 %}
+<div class="d-flex align-items-center justify-content-between px-3 py-3 border-top flex-wrap gap-2">
+  <small class="text-muted-2">Showing {{ page.start_index }}–{{ page.end_index }} of {{ page.paginator.count }}</small>
+  <ul class="pagination pagination-sm m-0">
+    {% if page.has_previous %}
+      <li class="page-item"><a class="page-link" href="?{% query_with page=page.previous_page_number %}"><i class="bi bi-chevron-left"></i></a></li>
+    {% endif %}
+    {% for n in page.paginator.page_range %}
+      {% if n == page.number %}
+        <li class="page-item active"><span class="page-link">{{ n }}</span></li>
+      {% elif n > page.number|add:-3 and n < page.number|add:3 %}
+        <li class="page-item"><a class="page-link" href="?{% query_with page=n %}">{{ n }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page.has_next %}
+      <li class="page-item"><a class="page-link" href="?{% query_with page=page.next_page_number %}"><i class="bi bi-chevron-right"></i></a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endif %}

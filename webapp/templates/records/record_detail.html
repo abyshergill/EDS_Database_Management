@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ record.component }}{% endblock %}
+{% block page_title %}{{ record.component }}{% endblock %}
+{% block page_subtitle %}Record #{{ record.pk }} · created {{ record.created_at|date:"M j, Y H:i" }} by {{ record.created_by.username|default:"(deleted user)" }}{% endblock %}
+{% block actions %}
+<a class="btn btn-light" href="{% url 'records:list' %}"><i class="bi bi-arrow-left"></i><span class="d-none d-md-inline"> Back</span></a>
+<a class="btn btn-primary" href="{% url 'records:update' record.pk %}"><i class="bi bi-pencil"></i><span class="d-none d-md-inline"> Edit</span></a>
+<button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal"
+        data-action="{% url 'records:delete' record.pk %}" data-name="{{ record.component }}"><i class="bi bi-trash"></i></button>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card-soft h-100">
+          <div class="card-header-soft"><span><i class="bi bi-camera me-1 text-primary"></i> VHX image</span>
+            {% if record.vhx_image %}<a class="btn btn-sm btn-light" href="{% url 'records:image' record.pk 'vhx' %}?download=1"><i class="bi bi-download"></i> Download</a>{% endif %}
+          </div>
+          <div class="p-3">
+            <div class="image-panel">
+              {% if record.vhx_image %}<img src="{% url 'records:image' record.pk 'vhx' %}" alt="VHX image" data-bs-toggle="modal" data-bs-target="#zoomModal">
+              {% else %}<div class="image-empty"><i class="bi bi-image"></i>No VHX image</div>{% endif %}
+            </div>
+            <div class="mt-3">
+              <div class="form-label mb-1">VHX remark</div>
+              <div class="text-muted-2" style="white-space: pre-wrap">{{ record.vhx_remark|default:"—" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card-soft h-100">
+          <div class="card-header-soft"><span><i class="bi bi-bar-chart me-1 text-primary"></i> EDS image</span>
+            {% if record.eds_image %}<a class="btn btn-sm btn-light" href="{% url 'records:image' record.pk 'eds' %}?download=1"><i class="bi bi-download"></i> Download</a>{% endif %}
+          </div>
+          <div class="p-3">
+            <div class="image-panel">
+              {% if record.eds_image %}<img src="{% url 'records:image' record.pk 'eds' %}" alt="EDS image" data-bs-toggle="modal" data-bs-target="#zoomModal">
+              {% else %}<div class="image-empty"><i class="bi bi-bar-chart"></i>No EDS image</div>{% endif %}
+            </div>
+            <div class="mt-3">
+              <div class="form-label mb-1">EDS remark</div>
+              <div class="text-muted-2" style="white-space: pre-wrap">{{ record.eds_remark|default:"—" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card-soft p-4">
+          <div class="form-label mb-1">Remark</div>
+          <div style="white-space: pre-wrap">{{ record.remark|default:"—" }}</div>
+          <hr class="my-3">
+          <div class="row text-muted-2 small g-2">
+            <div class="col-sm-6"><i class="bi bi-person-plus"></i> Created by <strong>{{ record.created_by.username|default:"(deleted user)" }}</strong> on {{ record.created_at|date:"M j, Y H:i" }}</div>
+            <div class="col-sm-6"><i class="bi bi-pencil-square"></i> Last modified by <strong>{{ record.modified_by.username|default:"—" }}</strong> on {{ record.modified_at|date:"M j, Y H:i" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card-soft">
+      <div class="card-header-soft"><span><i class="bi bi-clock-history me-1 text-primary"></i> Change history</span>
+        <span class="badge text-bg-light">{{ history|length }}</span>
+      </div>
+      <div class="p-3">
+        {% include "records/_history.html" with entries=history show_component=False %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="zoomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content bg-transparent border-0">
+      <img id="zoomImg" src="" alt="" class="img-fluid rounded-3 shadow">
+    </div>
+  </div>
+</div>
+{% include "records/_delete_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById("zoomModal").addEventListener("show.bs.modal", function (e) {
+    document.getElementById("zoomImg").src = e.relatedTarget.src;
+  });
+</script>
+{% endblock %}

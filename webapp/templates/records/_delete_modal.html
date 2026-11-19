@@ -1,0 +1,23 @@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content border-0" method="post" id="deleteForm" action="">
+      {% csrf_token %}
+      <div class="modal-body p-4 text-center">
+        <div class="stat-icon mx-auto mb-3" style="background:#fef2f2;color:#dc2626"><i class="bi bi-trash"></i></div>
+        <h5 class="fw-bold">Delete <span id="deleteName"></span>?</h5>
+        <p class="text-muted-2 mb-0">The record and its images will be removed. The deletion is recorded in the history log.</p>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  document.getElementById("deleteModal").addEventListener("show.bs.modal", function (e) {
+    var btn = e.relatedTarget;
+    document.getElementById("deleteForm").action = btn.dataset.action;
+    document.getElementById("deleteName").textContent = "“" + btn.dataset.name + "”";
+  });
+</script>

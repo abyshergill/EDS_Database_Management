@@ -1,4 +1,6 @@
 ## 🔬 Enhanced EDS Data Collection System Version 2.0
+
+> 🌐 **Web edition:** a Django rewrite with admin-managed accounts, change history and a modern UI is in [`webapp/`](webapp/README.md).
 A modern, secure data collection application for managing EDS (Energy Dispersive X-ray Spectroscopy) analysis results with VHX microscopy images.
 
 ### 🎯 Usage Guide

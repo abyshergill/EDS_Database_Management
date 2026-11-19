@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{% if is_new %}New record{% else %}Edit {{ record.component }}{% endif %}{% endblock %}
+{% block page_title %}{% if is_new %}New record{% else %}Edit record #{{ record.pk }}{% endif %}{% endblock %}
+{% block page_subtitle %}{% if is_new %}Add a component with its VHX and EDS images{% else %}Changes are recorded in the history log{% endif %}{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card-soft p-4">
+        <label class="form-label" for="{{ form.component.id_for_label }}">Component name <span class="text-danger">*</span></label>
+        {{ form.component }}
+        {% for e in form.component.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card-soft p-4 h-100">
+        <h6 class="fw-bold mb-3"><i class="bi bi-camera text-primary me-1"></i> VHX image</h6>
+        <div class="dropzone mb-3" data-input="{{ form.vhx_image.id_for_label }}">
+          {% if record.vhx_image %}<img class="preview" src="{% url 'records:image' record.pk 'vhx' %}" alt="Current VHX image"><div class="small text-muted-2 mt-2">Current image — choose a file to replace it</div>{% else %}<img class="preview d-none" alt=""><div class="small text-muted-2"><i class="bi bi-cloud-arrow-up fs-4 d-block"></i>Choose or drop an image</div>{% endif %}
+        </div>
+        {{ form.vhx_image }}
+        {% for e in form.vhx_image.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+        {% if record.vhx_image %}<div class="form-check mt-2">{{ form.remove_vhx_image }}<label class="form-check-label small" for="{{ form.remove_vhx_image.id_for_label }}">Remove current VHX image</label></div>{% endif %}
+        <label class="form-label mt-3" for="{{ form.vhx_remark.id_for_label }}">VHX remark</label>
+        {{ form.vhx_remark }}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card-soft p-4 h-100">
+        <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart text-primary me-1"></i> EDS image</h6>
+        <div class="dropzone mb-3" data-input="{{ form.eds_image.id_for_label }}">
+          {% if record.eds_image %}<img class="preview" src="{% url 'records:image' record.pk 'eds' %}" alt="Current EDS image"><div class="small text-muted-2 mt-2">Current image — choose a file to replace it</div>{% else %}<img class="preview d-none" alt=""><div class="small text-muted-2"><i class="bi bi-cloud-arrow-up fs-4 d-block"></i>Choose or drop an image</div>{% endif %}
+        </div>
+        {{ form.eds_image }}
+        {% for e in form.eds_image.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+        {% if record.eds_image %}<div class="form-check mt-2">{{ form.remove_eds_image }}<label class="form-check-label small" for="{{ form.remove_eds_image.id_for_label }}">Remove current EDS image</label></div>{% endif %}
+        <label class="form-label mt-3" for="{{ form.eds_remark.id_for_label }}">EDS remark</label>
+        {{ form.eds_remark }}
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card-soft p-4">
+        <label class="form-label" for="{{ form.remark.id_for_label }}">Remark</label>
+        {{ form.remark }}
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-primary px-4" type="submit"><i class="bi bi-check2"></i> {% if is_new %}Save record{% else %}Save changes{% endif %}</button>
+          <a class="btn btn-light" href="{% if is_new %}{% url 'records:list' %}{% else %}{% url 'records:detail' record.pk %}{% endif %}">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelectorAll(".dropzone").forEach(function (zone) {
+    var input = document.getElementById(zone.dataset.input);
+    if (!input) return;
+    var preview = zone.querySelector(".preview");
+    var caption = zone.querySelector("div");
+    function show(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.remove("d-none");
+        if (caption) caption.textContent = file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+    zone.addEventListener("click", function () { input.click(); });
+    input.addEventListener("change", function () { show(input.files[0]); });
+    ["dragenter", "dragover"].forEach(function (ev) {
+      zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add("drag"); });
+    });
+    ["dragleave", "drop"].forEach(function (ev) {
+      zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove("drag"); });
+    });
+    zone.addEventListener("drop", function (e) {
+      if (e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        show(input.files[0]);
+      }
+    });
+    zone.style.cursor = "pointer";
+  });
+</script>
+{% endblock %}

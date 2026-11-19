@@ -1,0 +1,36 @@
+{% load eds_tags %}
+<ul class="timeline">
+{% for h in entries %}
+  <li>
+    <span class="dot dot-{{ h.action }}">
+      {% if h.action == "create" %}<i class="bi bi-plus"></i>{% elif h.action == "update" %}<i class="bi bi-pencil"></i>{% else %}<i class="bi bi-x"></i>{% endif %}
+    </span>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <span class="badge-soft badge-{{ h.action }}">{{ h.get_action_display }}</span>
+      {% if show_component %}
+        {% if h.record_id %}<a class="fw-semibold" href="{% url 'records:detail' h.record_id %}">#{{ h.record_ref }} {{ h.component }}</a>
+        {% else %}<span class="fw-semibold">#{{ h.record_ref }} {{ h.component }}</span>{% endif %}
+      {% endif %}
+      <span class="text-muted-2 small">by <strong>{{ h.username }}</strong> · <span title="{{ h.timestamp }}">{{ h.timestamp|date:"M j, Y H:i" }}</span></span>
+    </div>
+    {% if h.changes and h.action == "update" %}
+    <div class="change-list">
+      {% for field, diff in h.changes.items %}
+      <div>
+        <strong>{{ field|field_label }}:</strong>
+        {% if field == "vhx_image" or field == "eds_image" %}
+          <span class="change-new">{{ diff.new }}</span>
+        {% else %}
+          <span class="change-old">{{ diff.old|default:"(empty)"|truncatechars:120 }}</span>
+          <i class="bi bi-arrow-right mx-1 text-muted-2"></i>
+          <span class="change-new">{{ diff.new|default:"(empty)"|truncatechars:120 }}</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </li>
+{% empty %}
+  <li class="text-muted-2">No history yet.</li>
+{% endfor %}
+</ul>

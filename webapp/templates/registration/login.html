@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block body %}
+<div class="auth-wrap">
+  <section class="auth-hero">
+    <div class="d-flex align-items-center gap-2 fw-bold">
+      <span class="brand-logo"><i class="bi bi-radioactive"></i></span> EDS Data System
+    </div>
+    <div>
+      <h1>Every analysis,<br>one secure place.</h1>
+      <p class="mt-3 mb-4">Store VHX microscopy images and EDS spectra with remarks, search them instantly, and keep a complete audit trail of every change.</p>
+      <div class="auth-feature"><i class="bi bi-images"></i> VHX &amp; EDS images side by side</div>
+      <div class="auth-feature"><i class="bi bi-clock-history"></i> Full change history per component</div>
+      <div class="auth-feature"><i class="bi bi-shield-lock"></i> Accounts managed by administrators</div>
+    </div>
+    <small class="text-white-50">Energy Dispersive X-ray Spectroscopy records</small>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h2 class="fw-bold mb-1">Welcome back</h2>
+      <p class="text-muted-2 mb-4">Sign in with the account provided by your administrator.</p>
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+        </div>
+        <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-box-arrow-in-right me-1"></i> Sign in</button>
+      </form>
+      <p class="text-muted-2 small mt-4 mb-0"><i class="bi bi-info-circle"></i> Need an account? Contact your administrator.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

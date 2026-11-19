@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}User accounts{% endblock %}
+{% block page_title %}User accounts{% endblock %}
+{% block page_subtitle %}Create accounts and manage access{% endblock %}
+{% block actions %}
+<a class="btn btn-primary" href="{% url 'accounts:create' %}"><i class="bi bi-person-plus"></i><span class="d-none d-sm-inline"> New account</span></a>
+{% endblock %}
+
+{% block content %}
+<div class="card-soft">
+  <div class="card-header-soft">
+    <form method="get" class="d-flex gap-2 flex-grow-1" style="max-width: 420px;">
+      <div class="search-input flex-grow-1"><i class="bi bi-search"></i>
+        <input class="form-control" type="search" name="q" value="{{ query }}" placeholder="Search users…" aria-label="Search users">
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    <small class="text-muted-2">{{ page.paginator.count }} account{{ page.paginator.count|pluralize }}</small>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-modern">
+      <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Records</th><th>Last login</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+      {% for u in page.object_list %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="avatar avatar-sm">{{ u.username|first }}</span>
+              <div class="lh-sm">
+                <div class="fw-semibold">{{ u.username }}{% if u.pk == user.pk %} <span class="text-muted-2 small">(you)</span>{% endif %}</div>
+                <small class="text-muted-2">{{ u.get_full_name|default:u.email|default:"—" }}</small>
+              </div>
+            </div>
+          </td>
+          <td>{% if u.is_staff or u.is_superuser %}<span class="badge-soft badge-admin"><i class="bi bi-shield-check"></i> Admin</span>{% else %}<span class="badge-soft badge-user">User</span>{% endif %}</td>
+          <td>{% if u.is_active %}<span class="badge-soft badge-create">Active</span>{% else %}<span class="badge-soft badge-inactive">Inactive</span>{% endif %}</td>
+          <td>{{ u.n_records }}</td>
+          <td class="text-muted-2">{{ u.last_login|naturaltime|default:"Never" }}</td>
+          <td class="text-end text-nowrap">
+            <a class="btn btn-light btn-icon" href="{% url 'accounts:update' u.pk %}" title="Edit"><i class="bi bi-pencil"></i></a>
+            <a class="btn btn-light btn-icon" href="{% url 'accounts:password' u.pk %}" title="Reset password"><i class="bi bi-key"></i></a>
+            {% if u.pk != user.pk %}
+            <button class="btn btn-light btn-icon text-danger" type="button" title="Delete"
+                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    data-action="{% url 'accounts:delete' u.pk %}" data-name="{{ u.username }}"><i class="bi bi-trash"></i></button>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="empty-state"><i class="bi bi-people"></i><div class="mt-2">No users found.</div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "partials/pagination.html" %}
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content border-0" method="post" id="deleteForm" action="">
+      {% csrf_token %}
+      <div class="modal-body p-4 text-center">
+        <div class="stat-icon mx-auto mb-3" style="background:#fef2f2;color:#dc2626"><i class="bi bi-person-x"></i></div>
+        <h5 class="fw-bold">Delete account <span id="deleteName"></span>?</h5>
+        <p class="text-muted-2 mb-0">Records and history entries made by this user are kept. Consider deactivating the account instead.</p>
+      </div>
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger">Delete account</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("deleteModal").addEventListener("show.bs.modal", function (e) {
+    document.getElementById("deleteForm").action = e.relatedTarget.dataset.action;
+    document.getElementById("deleteName").textContent = "“" + e.relatedTarget.dataset.name + "”";
+  });
+</script>
+{% endblock %}
